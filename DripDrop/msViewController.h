@@ -14,6 +14,5 @@
 
 @interface msViewController : UIViewController <ADBannerViewDelegate, GADBannerViewDelegate>
 
-@property (nonatomic, strong) ADBannerView *banner;
 
 @end

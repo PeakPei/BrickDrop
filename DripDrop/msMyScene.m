@@ -63,15 +63,14 @@
         [self addChild:copyrightLabel];
         
         SKLabelNode *versionLabel = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
-        versionLabel.text = @"v1.0.2";
+        versionLabel.text = @"v1.1";
         versionLabel.fontColor = [UIColor blackColor];
         versionLabel.fontSize = 15;
         versionLabel.position = CGPointMake(CGRectGetMaxX(self.frame)-5-versionLabel.frame.size.width/2, CGRectGetMinY(self.frame)+5);
         versionLabel.name = @"versionLabel";
         [self addChild:versionLabel];
         
-        /* DISABLED FOR 1.0.2
-        //TEMP: Currency System
+        //TEMP: Currency System beta for 1.1
         unsigned long currency = [[NSUserDefaults standardUserDefaults] integerForKey:@"gameCurrency"]; // Get Currency
         NSString *currencyString = [NSString stringWithFormat:@"Currency: %lu",currency];
         NSString *currencyLabelText = currencyString;
@@ -82,26 +81,25 @@
         currencyLabel.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame)+50);
         currencyLabel.name = @"currencyLabel";
         [self addChild:currencyLabel];
-        */
         
     }
     return self;
 }
 -(void) setupMenu {
-    //buttons
+    // Play Button
     SKSpriteNode *playButton = [SKSpriteNode spriteNodeWithImageNamed:@"play_icon"];
     playButton.position = CGPointMake(CGRectGetMidX(self.frame)-50, CGRectGetMinY(self.frame)+150);
     playButton.name = @"SS_startGameButton";
     [self addChild:playButton];
+    // Leaderboards Button
     SKSpriteNode *leaderboardsButton = [SKSpriteNode spriteNodeWithImageNamed:@"leaderboards_icon"];
     leaderboardsButton.position = CGPointMake(CGRectGetMidX(self.frame)+50, CGRectGetMinY(self.frame)+150);
     leaderboardsButton.name = @"SS_leaderboardsButton";
     [self addChild:leaderboardsButton];
+    // Required to fix repetitive sound bug
     _pressedPlayButton = NO;
     _pressedBackButton = YES;
-    
-    /* DISABLED FOR 1.0.2
-    //Version 1.1 Menu
+    //Version 1.1 Menu additions
     SKLabelNode *shopButton = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
     shopButton.text = @"Shop";
     shopButton.fontColor = [UIColor blackColor];
@@ -109,8 +107,6 @@
     shopButton.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMinY(self.frame)+200);
     shopButton.name = @"shopButton";
     [self addChild:shopButton];
-    */
-    
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -129,13 +125,13 @@
     SKNode *leaderboardsButton = [self childNodeWithName:@"SS_leaderboardsButton"];
     SKNode *GG_mainMenuButton = [self childNodeWithName:@"GG_mainMenuButton"];
     SKNode *GG_gameOverScreen = [self childNodeWithName:@"GG_gameOverScreen"];
-    //Version 1.1 SKNodes
+    //Version 1.1 SKNode additions
     SKNode *shopButton = [self childNodeWithName:@"shopButton"];
     SKNode *buyYellowBall = [self childNodeWithName:@"buyYellowBall"];
     SKNode *useYellowBall = [self childNodeWithName:@"useYellowBall"];
     SKNode *useBlueBall = [self childNodeWithName:@"useBlueBall"];
     
-    if ([startGameButton containsPoint:location]) {
+    if ([startGameButton containsPoint:location]) { // Load menu with game mode selection
         if (_pressedPlayButton == NO) {
             _pressedPlayButton = YES;
             _pressedBackButton = NO;
@@ -196,21 +192,21 @@
 
         }
     }
-    if ([startGameButton2 containsPoint:location] || [playButtonText containsPoint:location]) {
+    if ([startGameButton2 containsPoint:location] || [playButtonText containsPoint:location]) { //BrickDrop Play button
         [playButtonText runAction:fadeOutMenu];
         [startGameButton2 runAction:fadeOutMenu completion:^{
             SKScene *msGameSceneLoad = [[msGameScene alloc] initWithSize:self.size];
             [self.view presentScene:msGameSceneLoad];
         }];
     }
-    if ([timeAttackButton containsPoint:location] || [timeAttackButtonText containsPoint:location]) {
+    if ([timeAttackButton containsPoint:location] || [timeAttackButtonText containsPoint:location]) { //TimeAttack Play button
         [timeAttackButtonText runAction:fadeOutMenu];
         [timeAttackButton runAction:fadeOutMenu completion:^{
             SKScene *mstimeAttackGameSceneLoad = [[msTimeAttackGameScene alloc] initWithSize:self.size];
             [self.view presentScene:mstimeAttackGameSceneLoad];
         }];
     }
-    if ([leaderboardsButton containsPoint:location]) {
+    if ([leaderboardsButton containsPoint:location]) { // Leaderboards Button
         [self runAction:[SKAction playSoundFileNamed:@"score.m4a" waitForCompletion:NO]];
         [leaderboardsButton runAction:[SKAction fadeOutWithDuration:0.2]];
             GKGameCenterViewController *gameCenterController = [[GKGameCenterViewController alloc] init];
@@ -223,7 +219,7 @@
                 }];
             }
     }
-    if ([GG_mainMenuButton containsPoint:location]) {
+    if ([GG_mainMenuButton containsPoint:location]) { // Back button
         if (_pressedBackButton == NO) {
             _pressedBackButton = YES;
             [self runAction:[SKAction playSoundFileNamed:@"score.m4a" waitForCompletion:NO]];
@@ -241,7 +237,7 @@
             }];
         }
     }
-    if ([shopButton containsPoint:location]) {
+    if ([shopButton containsPoint:location]) { // Shop button
         if (_pressedPlayButton == NO) {
             _pressedPlayButton = YES;
             _pressedBackButton = NO;
@@ -305,7 +301,7 @@
         }
     }
     
-    if ([buyYellowBall containsPoint:location]) {
+    if ([buyYellowBall containsPoint:location]) { // Buy Yellow Ball button
         unsigned long currency = [[NSUserDefaults standardUserDefaults] integerForKey:@"gameCurrency"]; // Get Currency
         if (currency >= 5) {
             //Price
@@ -346,7 +342,7 @@
             [self addChild:yellowBall];
             [yellowBall runAction:[SKAction fadeAlphaTo:1 duration:0.25]];
             
-        } else {
+        } else { // Player doesnt have enough currency to buy the item
             [self runAction:[SKAction playSoundFileNamed:@"thud.m4a" waitForCompletion:NO]];
             NSLog(@"not enough currency");
         }

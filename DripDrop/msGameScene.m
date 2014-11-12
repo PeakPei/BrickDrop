@@ -9,9 +9,10 @@
 #import "msGameScene.h"
 #import "msMyScene.h"
 
+// Physic contact categories
 static const uint32_t ballCategory = 0x1 << 0;
 static const uint32_t bricksCategory = 0x1 << 1;
-static const uint32_t powersCategory = 0x1 << 2;
+static const uint32_t currencyCategory = 0x1 << 2;
 
 @interface msGameScene()
 @property BOOL contentCreated;
@@ -244,13 +245,12 @@ static const uint32_t powersCategory = 0x1 << 2;
     platform2.name = @"platform2";
     [pipePair addChild:platform2];
     
-    /* DISABLED FOR 1.0.2
     if (arc4random_uniform(100)+1 == 1) {
         SKSpriteNode *powerUp = [[SKSpriteNode alloc] initWithColor:[SKColor redColor] size:CGSizeMake(10,10)];
         powerUp.position = CGPointMake(platform1.position.x,CGRectGetMinY(self.frame)+10);
         powerUp.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:powerUp.size];
         powerUp.physicsBody.dynamic = NO;
-        powerUp.physicsBody.categoryBitMask = powersCategory;
+        powerUp.physicsBody.categoryBitMask = currencyCategory;
         powerUp.physicsBody.contactTestBitMask = ballCategory;
         powerUp.name = @"powerUp";
         [_platforms addChild:powerUp];
@@ -260,13 +260,12 @@ static const uint32_t powersCategory = 0x1 << 2;
         powerUp.position = CGPointMake(platform2.position.x,CGRectGetMinY(self.frame)+10);
         powerUp.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:powerUp.size];
         powerUp.physicsBody.dynamic = NO;
-        powerUp.physicsBody.categoryBitMask = powersCategory;
+        powerUp.physicsBody.categoryBitMask = currencyCategory;
         powerUp.physicsBody.contactTestBitMask = ballCategory;
         powerUp.name = @"powerUp";
         [_platforms addChild:powerUp];
         [powerUp runAction: _movePipesAndRemove];
     }
-    */
     
     [pipePair runAction:_movePipesAndRemove];
     [_platforms addChild:pipePair];
@@ -284,19 +283,17 @@ static const uint32_t powersCategory = 0x1 << 2;
     [_platforms addChild:platform];
     [platform runAction: _movePipesAndRemove];
     
-    /* DISABLED FOR 1.0.2
     if (arc4random_uniform(100)+1 == 1) {
         SKSpriteNode *powerUp = [[SKSpriteNode alloc] initWithColor:[SKColor redColor] size:CGSizeMake(10,10)];
         powerUp.position = CGPointMake(platform.position.x,CGRectGetMinY(self.frame)+20);
         powerUp.physicsBody = [SKPhysicsBody bodyWithRectangleOfSize:powerUp.size];
         powerUp.physicsBody.dynamic = NO;
-        powerUp.physicsBody.categoryBitMask = powersCategory;
+        powerUp.physicsBody.categoryBitMask = currencyCategory;
         powerUp.physicsBody.contactTestBitMask = ballCategory;
         powerUp.name = @"powerUp";
         [_platforms addChild:powerUp];
         [powerUp runAction: _movePipesAndRemove];
     }
-    */
     
 }
 -(SKLabelNode *) score:(NSString*)scoreString {
@@ -566,7 +563,7 @@ static const uint32_t powersCategory = 0x1 << 2;
         [self runAction:[SKAction playSoundFileNamed:@"thud.m4a" waitForCompletion:NO]];
     }
     
-    if (collision == (ballCategory | powersCategory)) {
+    if (collision == (ballCategory | currencyCategory)) {
         _currency +=1;
         NSLog(@"Got 1 coin, now at %lu currency",_currency);
         SKNode *powerUp = [_platforms childNodeWithName:@"powerUp"];

@@ -7,23 +7,20 @@
 
 #import "msViewController.h"
 #import "msMyScene.h"
-
-#import "GADBannerView.h"
-#import "GADRequest.h"
+#import "GADBannerView.h" // Google AdMob Banner
 
 @interface msViewController () {
     bool iadsBannerIsVisible;
 }
-@property(nonatomic, strong) GADBannerView *bannerView;
-
+@property (nonatomic, strong) ADBannerView *iAdBannerView; // iAd
+@property(nonatomic, strong) GADBannerView *adMobBannerView; // AdMob
 @end
 
 @implementation msViewController
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
-    [self loadAds];
+    [self loadAds]; // Setup Ad containers
 
     // Configure the view.
     SKView * skView = (SKView *)self.view;
@@ -38,8 +35,7 @@
     [skView presentScene:scene];
 }
 
-- (BOOL)shouldAutorotate
-{
+- (BOOL)shouldAutorotate {
     return YES;
 }
 
@@ -47,8 +43,7 @@
     return YES;
 }
 
-- (NSUInteger)supportedInterfaceOrientations
-{
+- (NSUInteger)supportedInterfaceOrientations {
     if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         return UIInterfaceOrientationMaskAllButUpsideDown;
     } else {
@@ -56,68 +51,62 @@
     }
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Release any cached data, images, etc that aren't in use.
 }
 
--(void) viewWillLayoutSubviews {
-    // test to see if its okay to show iAds... if so, call...
-}
+-(void) viewWillLayoutSubviews {}
 
 -(void) loadAds {
-    
     // Setup iAds
-    _banner = [[ADBannerView alloc] initWithFrame:CGRectZero];
-    [_banner setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
-    _banner.delegate = self;
+    self.iAdBannerView = [[ADBannerView alloc] initWithFrame:CGRectZero];
+    [self.iAdBannerView setAutoresizingMask:UIViewAutoresizingFlexibleWidth];
+    self.iAdBannerView.delegate = self;
     iadsBannerIsVisible = YES;
-    [self.view addSubview:_banner];
-    NSLog(@"Showing iAd banner");
-
+    [self.view addSubview:self.iAdBannerView];
+    
     // Setup AdMob
-    self.bannerView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeSmartBannerPortrait];
-    self.bannerView.hidden = YES;
-    self.bannerView.adUnitID = @"ca-app-pub-8546202416581405/5925936775";
-    self.bannerView.rootViewController = self;
-    [self.view addSubview:self.bannerView];
+    self.adMobBannerView = [[GADBannerView alloc] initWithAdSize:kGADAdSizeSmartBannerPortrait];
+    self.adMobBannerView.hidden = YES;
+    self.adMobBannerView.adUnitID = @"ca-app-pub-8546202416581405/5925936775";
+    self.adMobBannerView.rootViewController = self;
+    [self.view addSubview:self.adMobBannerView];
     // Now Call with [self showBanner]
 }
 
 - (void)showBanner {
-    self.bannerView.hidden = NO;
+    self.adMobBannerView.hidden = NO;
     GADRequest *request = [GADRequest request];
     request.testDevices = @[ GAD_SIMULATOR_ID ];
-    [self.bannerView loadRequest:request];
+    [self.adMobBannerView loadRequest:request];
 }
 
-- (void)bannerViewDidLoadAd:(ADBannerView *)banner {
+- (void)bannerViewDidLoadAd:(ADBannerView *)iAdBannerView {
     iadsBannerIsVisible = YES;
     [UIView beginAnimations:@"animateAdBannerOn" context:NULL];
     [UIView commitAnimations];
+    NSLog(@"iAd loaded");
 }
 
-- (BOOL)bannerViewActionShouldBegin:(ADBannerView *)banner willLeaveApplication:(BOOL)willLeave {
+- (BOOL)bannerViewActionShouldBegin:(ADBannerView *)iAdBannerView willLeaveApplication:(BOOL)willLeave { // iAd banner touched
     BOOL shouldExecuteAction = YES; // your app implements this method
     if (!willLeave && shouldExecuteAction){
         // insert code here to suspend any services that might conflict with the advertisement, for example, you might pause the game with an NSNotification like this...
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"PauseScene" object:nil]; //optional
+        //[[NSNotificationCenter defaultCenter] postNotificationName:@"PauseScene" object:nil];
     }
     return shouldExecuteAction;
 }
 
--(void) bannerViewActionDidFinish:(ADBannerView *)banner {
+-(void) bannerViewActionDidFinish:(ADBannerView *)iAdBannerView { // iAd banner closed
     //Unpause the game if you paused it previously.
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"UnPauseScene" object:nil]; //optional
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"UnPauseScene" object:nil];
 }
 
-- (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
-{
+- (void)bannerView:(ADBannerView *)iAdBannerView didFailToReceiveAdWithError:(NSError *)error { // iAd failed to load
     if (iadsBannerIsVisible == YES) {
-        
         [UIView beginAnimations:@"animateAdBannerOff" context:NULL];
-        banner.frame = CGRectOffset(banner.frame, 0, -banner.frame.size.height);
+        iAdBannerView.frame = CGRectOffset(iAdBannerView.frame, 0, -iAdBannerView.frame.size.height);
         [UIView commitAnimations];
         //iadsBannerIsVisible = NO;
     }
@@ -125,12 +114,12 @@
     [self showBanner];
 }
 
--(void)adViewDidReceiveAd:(GADBannerView *)adView {
+-(void)adViewDidReceiveAd:(GADBannerView *)adMobBannerView {
     NSLog(@"Ad Received");
 }
 
--(void)adView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error {
+-(void)adMobBannerView:(GADBannerView *)view didFailToReceiveAdWithError:(GADRequestError *)error {
     NSLog(@"Failed to receive ad due to: %@", [error localizedFailureReason]);
-    self.bannerView.hidden = YES;
+    self.adMobBannerView.hidden = YES;
 }
 @end

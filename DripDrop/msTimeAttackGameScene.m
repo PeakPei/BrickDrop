@@ -9,6 +9,7 @@
 #import "msTimeAttackGameScene.h"
 #import "msMyScene.h"
 
+// Physic contact categories
 static const uint32_t ballCategory = 0x1 << 0;
 static const uint32_t bricksCatergory = 0x1 << 1;
 
