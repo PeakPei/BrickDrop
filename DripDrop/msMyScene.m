@@ -63,7 +63,7 @@
         [self addChild:copyrightLabel];
         
         SKLabelNode *versionLabel = [SKLabelNode labelNodeWithFontNamed:@"Helvetica"];
-        versionLabel.text = @"v1.1";
+        versionLabel.text = @"v1.1 UNRELEASED BUILD";
         versionLabel.fontColor = [UIColor blackColor];
         versionLabel.fontSize = 15;
         versionLabel.position = CGPointMake(CGRectGetMaxX(self.frame)-5-versionLabel.frame.size.width/2, CGRectGetMinY(self.frame)+5);
